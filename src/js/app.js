@@ -299,9 +299,9 @@ function getRandomString(playerNumber) {
 function changeImage(strChoice, playerNumber) {
 
   if (playerNumber == 1) {
-    document.getElementById("img_player1").src = strChoice + ".png";
+    document.getElementById("img_player1").src = "/img/" + strChoice + ".png";
   } else {
-    document.getElementById("img_player2").src = strChoice + ".png";
+    document.getElementById("img_player2").src = "/img/" + strChoice + ".png";
   }
 
 }
