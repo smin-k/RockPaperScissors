@@ -1,5 +1,5 @@
 /**
- * @author Noah-Vincenz Noeh <nn4718@icl.ac.uk>
+ * @author Noah-Vincenz Noeh <noah-vincenz.noeh18@imperial.ac.uk>
  */
 
 App = {
@@ -147,7 +147,7 @@ App = {
         return inst.lockShape(playerNumber, shape, str, {from: account});
 
       }).then(() => {
-        return inst.getLocked(playerNumber);
+        return inst.hasLocked(playerNumber);
       }).then(boolean => {
         console.log(boolean);
         if (boolean) {
@@ -237,10 +237,10 @@ App = {
       var account = accounts[0];
       App.contracts.RockPaperScissors.deployed().then(instance => {
         inst = instance;
-        return inst.getLocked(1);
+        return inst.hasLocked(1);
       }).then(boolean => {
         console.log("Player1 is locked: " + boolean);
-        return inst.getLocked(2);
+        return inst.hasLocked(2);
       }).then(boolean => {
         console.log("Player2 is locked: " + boolean);
 
