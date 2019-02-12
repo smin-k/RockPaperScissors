@@ -34,22 +34,15 @@ contract RockPaperScissors {
     _;
   }
 
+  modifier bothRevealed(){
+    require(!stringsEqual(revealedP1Shape, "") && !stringsEqual(revealedP2Shape, ""));
+    _;
+  }
+
   // this is to make sure that a registered player cannot lock / reveal another player's shape
   modifier correctPlayer(int playerNumber) {
     require((msg.sender == player1 && playerNumber == 1) || (msg.sender == player2 && playerNumber == 2));
     _;
-  }
-
-  /**
-  * @notice This function returns the corresponding player's address.
-  * @param playerNumber The player's number (either 1 or 2).
-  * @return The player's address.
-  */
-  function getPlayer(int playerNumber) public view returns (address) {
-    if (playerNumber == 1)
-      return player1;
-    else
-      return player2;
   }
 
   /**
@@ -74,6 +67,18 @@ contract RockPaperScissors {
       return (!stringsEqual(revealedP1Shape, ""));
     else
       return (!stringsEqual(revealedP2Shape, ""));
+  }
+
+  /**
+  * @notice This function returns the corresponding player's address.
+  * @param playerNumber The player's number (either 1 or 2).
+  * @return The player's address.
+  */
+  function getPlayer(int playerNumber) public view returns (address) {
+    if (playerNumber == 1)
+      return player1;
+    else
+      return player2;
   }
 
   /**
@@ -145,18 +150,15 @@ contract RockPaperScissors {
   * @param shape The player's selected shape ("Rock", "Paper" or "Scissors").
   * @param randomStringToHash The player's selected random string to hash the shape with.
   */
-  function lockShape(int playerNumber, string memory shape, string memory randomStringToHash) public correctPlayer(playerNumber) isRegistered returns (bool) {
+  function lockShape(int playerNumber, string memory shape, string memory randomStringToHash) public correctPlayer(playerNumber) isRegistered {
     // if the player is locking his own shape AND if it is the player's address that calls this AND if the player's hash has not been set
     if(msg.sender == player1 && hash1 == bytes32(0)) {
       // XOR random string with shape
       hash1 = keccak256(bytes(shape)) ^ keccak256(bytes(randomStringToHash));
-      return true;
     }
     if(msg.sender == player2 && hash2 == bytes32(0)) {
       hash2 = keccak256(bytes(shape)) ^ keccak256(bytes(randomStringToHash));
-      return true;
     }
-    return false;
   }
 
   /**
@@ -165,22 +167,19 @@ contract RockPaperScissors {
   * @param shape The player's selected shape ("Rock", "Paper" or "Scissors").
   * @param randomStringToHash The player's selected random string to hash the shape with.
   */
-  function revealShape(int playerNumber, string memory shape, string memory randomStringToHash) public isRegistered bothLocked correctPlayer(playerNumber) returns (int) {
+  function revealShape(int playerNumber, string memory shape, string memory randomStringToHash) public isRegistered bothLocked correctPlayer(playerNumber) {
     bytes32 tempHash = keccak256(bytes(shape)) ^ keccak256(bytes(randomStringToHash));
 
 		if(msg.sender == player1){
 			if(tempHash == hash1){
 				if(stringsEqual(shape, "Rock")) {
 					revealedP1Shape = "Rock";
-          return 1;
 				}
         if(stringsEqual(shape, "Paper")) {
           revealedP1Shape = "Paper";
-          return 1;
 				}
         if(stringsEqual(shape, "Scissors")) {
           revealedP1Shape = "Scissors";
-          return 1;
 				}
         // shape is going to be one of the above
 			}
@@ -189,26 +188,22 @@ contract RockPaperScissors {
 			if(tempHash == hash2){
 				if(stringsEqual(shape, "Rock")) {
 					revealedP2Shape = "Rock";
-          return 1;
 				}
         if(stringsEqual(shape, "Paper")) {
           revealedP2Shape = "Paper";
-          return 1;
 				}
         if(stringsEqual(shape, "Scissors")) {
           revealedP2Shape = "Scissors";
-          return 1;
 				}
 			}
 		}
-    return 0;
 	}
 
   /**
   * @notice This function computes the winner shape from two shapes and returns 1 if player 1 wins, 2 if player 2 wins and 0 if it is a draw.
   * @param revealedP1 Player 1's revealed shape.
   * @param revealedP2 Player 2's revealed shape.
-  * @returns 1, 2 or 0 depending on which player won the game (0 in the case of a draw).
+  * @return 1, 2 or 0 depending on which player won the game (0 in the case of a draw).
   */
   function computeWinner(string memory revealedP1, string memory revealedP2) pure public returns (int) {
 
@@ -226,7 +221,7 @@ contract RockPaperScissors {
   /**
   * @notice This function is called when both players have locked and revealed their shapes and the 'Distribute Rewards' button in the UI is pressed.
   */
-  function play() public payable bothLocked returns (int) {
+  function play() public payable bothLocked bothRevealed isRegistered {
 
     int winner = computeWinner(revealedP1Shape, revealedP2Shape);
 
@@ -244,9 +239,8 @@ contract RockPaperScissors {
 			player2.transfer(5 ether);
 
     }
-    resetVariables();
     lastWinner = winner;
-    return winner;
+    resetVariables();
 
   }
 
@@ -260,13 +254,13 @@ contract RockPaperScissors {
 
   /**
   * @notice This function compares two strings (memory) and checks whether these are equal and returns the corresponding boolean.
-  * @param _a First string to compare with.
-  * @param _b Second string to compare with.
-  * @returns true or false depending on whether the two strings are equal.
+  * @param stringA First string to compare with.
+  * @param stringB Second string to compare with.
+  * @return true or false depending on whether the two strings are equal.
   */
-  function stringsEqual(string memory _a, string memory _b) public pure returns (bool) {
-    bytes memory a = bytes(_a);
-    bytes memory b = bytes(_b);
+  function stringsEqual(string memory stringA, string memory stringB) public pure returns (bool) {
+    bytes memory a = bytes(stringA);
+    bytes memory b = bytes(stringB);
 
     if (a.length != b.length)
         return false;
