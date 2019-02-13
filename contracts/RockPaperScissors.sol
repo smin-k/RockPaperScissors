@@ -219,7 +219,7 @@ contract RockPaperScissors {
   /**
   * @notice This function is called when both players have locked and revealed their shapes and the 'Distribute Rewards' button in the UI is pressed.
   */
-  function play() public payable bothLocked bothRevealed isRegistered {
+  function distributeRewards() public payable bothLocked bothRevealed isRegistered {
 
     int winner = computeWinner(revealedP1Shape, revealedP2Shape);
 
