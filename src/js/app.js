@@ -16,8 +16,7 @@ App = {
 
   initWeb3: function() {
 
-    console.log("initialising web3")
-
+    // initialising web3
     if (typeof web3 !== 'undefined') {
 
       App.web3Provider = web3.currentProvider;
@@ -34,15 +33,15 @@ App = {
   },
 
   initContract: function() {
-    console.log("initialising contract")
 
+    // initialising the contract
+    // the json file stores the contract ABI which is passed into the 'RockPaperScissorsArtifact'
     var req = $.getJSON('RockPaperScissors.json', function(data) {
 
       var RockPaperScissorsArtifact = data;
       App.contracts.RockPaperScissors = TruffleContract(RockPaperScissorsArtifact);
 
       App.contracts.RockPaperScissors.setProvider(App.web3Provider);
-      console.log(App.contracts.RockPaperScissors.deployed());
 
     });
     req.done(function() {
@@ -56,27 +55,7 @@ App = {
     App.contracts.RockPaperScissors.deployed().then(function(instance) {
       inst = instance;
 
-      inst.getPlayer(1).then(addr => {
-        // checks if player1 is already registered - if so disable register button
-        if (addr == '0x0000000000000000000000000000000000000000' || addr == '0x') {
-          console.log("Player1 needs to register - " + addr);
-        } else {
-          console.log("Player1 is already registered at address: " + addr);
-          document.getElementById("register1").disabled = true;
-          document.getElementById("header_p1").innerHTML = "Player1: " + addr;
-        }
-      });
-      inst.getPlayer(2).then(addr => {
-        if (addr == '0x0000000000000000000000000000000000000000' || addr == '0x') {
-          console.log("Player2 needs to register - " + addr);
-        } else {
-          console.log("Player2 is already registered at address: " + addr);
-          document.getElementById("register2").disabled = true;
-          document.getElementById("header_p2").innerHTML = "Player2: " + addr;
-        }
-      });
-      document.getElementById("play").disabled = true;
-
+      getStatus(inst);
 
     }).catch(function(err) {
       console.error(err);
@@ -91,37 +70,23 @@ App = {
         console.error(err);
       }
       var account = accounts[0];
-      console.log('Account to be registered: ' + account);
       App.contracts.RockPaperScissors.deployed().then(instance => {
-        console.log(instance)
-        console.log('PlayerNumber: ' + playerNumber);
         inst = instance;
         if (playerNumber == 1) {
           // need to send tokens in order for the contract to be able to transfer these at the end of the game.
-          return inst.registerPlayer(1, {from: account, value:web3.toWei(5, "ether")});
+          return inst.registerPlayer(1, {from: account, value: web3.toWei(5, "ether")});
         }
         else {
-          return inst.registerPlayer(2, {from: account, value:web3.toWei(5, "ether")});
+          return inst.registerPlayer(2, {from: account, value: web3.toWei(5, "ether")});
         }
       }).then(() => {
-        console.log("Successfully Registered Player " + playerNumber);
-        if (playerNumber == 1) {
-          document.getElementById("register1").disabled = true;
-        } else {
-          document.getElementById("register2").disabled = true;
-        }
-        return inst.getPlayer(playerNumber);
+
+        return inst.getAddress(playerNumber);
 
       }).then(addr => {
-        console.log(addr);
-        if (playerNumber == 1) {
-          document.getElementById("header_p1").innerHTML = "Player1: " + addr;
-        } else {
-          document.getElementById("header_p2").innerHTML = "Player2: " + addr;
-        }
-        return inst.getHash(playerNumber);
-      }).then(hash => {
-        console.log("HASH: " + hash);
+
+        setRegistered(playerNumber, addr);
+
       }).catch(function(err) {
         console.error(err);
       });
@@ -137,43 +102,11 @@ App = {
         console.error(err);
       }
       var account = accounts[0];
-      console.log(account)
-      App.contracts.RockPaperScissors.deployed().then(function(instance) {
+      App.contracts.RockPaperScissors.deployed().then(instance => {
         inst = instance;
-        console.log(playerNumber);
-        console.log(shape);
-        console.log(str);
-
         return inst.lockShape(playerNumber, shape, str, {from: account});
-
       }).then(() => {
-        return inst.hasLocked(playerNumber);
-      }).then(boolean => {
-        console.log(boolean);
-        if (boolean) {
-          console.log("Successfully locked player shape.");
-          if (playerNumber == 1) {
-            document.getElementById("lock1").disabled = true;
-            document.getElementById("str1").value = "";
-            document.getElementById("status-p1").innerHTML = "Successfully locked player shape.";
-          } else if (playerNumber == 2){
-            document.getElementById("lock2").disabled = true;
-            document.getElementById("str2").value = "";
-            document.getElementById("status-p2").innerHTML = "Successfully locked player shape.";
-          }
-          if (document.getElementById("lock1").disabled == true && document.getElementById("lock2").disabled == true) {
-            document.getElementById("reveal1").disabled = false;
-            document.getElementById("reveal2").disabled = false;
-          }
-        } else {
-          console.log("Could not lock player shape.");
-        }
-        return inst.getHash(playerNumber);
-      }).then(hash => {
-        console.log(hash);
-        return inst.getRevealed(playerNumber);
-      }).then(string => {
-        console.log("REVEALED: " + string);
+        setLocked(playerNumber, inst);
       }).catch(function(err) {
         console.error(err);
       });
@@ -189,39 +122,21 @@ App = {
         console.error(err);
       }
       var account = accounts[0];
-      console.log(account);
       App.contracts.RockPaperScissors.deployed().then(instance => {
         inst = instance;
-        console.log(shape);
-        console.log(str);
         return inst.revealShape(playerNumber, shape, str, {from: account});
       }).then(() => {
         return inst.getRevealed(playerNumber);
       }).then(string => {
-        console.log("REVEALED:" + string);
         if (string != "") {
-          console.log("Successfully revealed player shape.");
-          if (playerNumber == 1) {
-            document.getElementById("status-p1").innerHTML = "Successfully revealed player shape.";
-            document.getElementById("reveal1").disabled = true;
-          } else if (playerNumber == 2){
-            document.getElementById("status-p2").innerHTML = "Successfully revealed player shape.";
-            document.getElementById("reveal2").disabled = true;
-          }
-          if (document.getElementById("reveal1").disabled == true && document.getElementById("reveal2").disabled == true) {
-            document.getElementById("play").disabled = false;
-          }
+          setRevealed(playerNumber, inst)
         } else {
           if (playerNumber == 1) {
             document.getElementById("status-p1").innerHTML = "Could not reveal player shape.";
           } else if (playerNumber == 2) {
             document.getElementById("status-p2").innerHTML = "Could not reveal player shape.";
           }
-          console.log("Could not reveal player shape.");
         }
-        return inst.getHash(playerNumber);
-      }).then(hash => {
-        console.log("HASH: " + hash);
       }).catch(function(err) {
         console.error(err);
       });
@@ -239,16 +154,12 @@ App = {
         inst = instance;
         return inst.hasLocked(1);
       }).then(boolean => {
-        console.log("Player1 is locked: " + boolean);
         return inst.hasLocked(2);
       }).then(boolean => {
-        console.log("Player2 is locked: " + boolean);
-
-        return inst.play({from: account, gas: "100000"});
+        return inst.play({from: account, gas: "1000000"});
       }).then(() => {
         return inst.getWinner();
       }).then(winnerInt => {
-        console.log("Successfully played the game. Winner: " + winnerInt);
         if (winnerInt == 1) {
           document.getElementById("winner-label").innerHTML = "Player1 won the last game.";
         } else if (winnerInt == 2) {
@@ -256,25 +167,15 @@ App = {
         } else {
           document.getElementById("winner-label").innerHTML = "The last game was a draw.";
         }
-        resetView();
-
+        document.getElementById("register1").disabled = false;
+        document.getElementById("register2").disabled = false;
+        App.setUp();
       }).catch(function(err) {
         console.error(err);
       });
     });
   }
 };
-
-function resetView() {
-  document.getElementById("header_p1").innerHTML = "Player1";
-  document.getElementById("header_p2").innerHTML = "Player2";
-  document.getElementById("lock1").disabled = false;
-  document.getElementById("lock2").disabled = false;
-  document.getElementById("play").disabled = true;
-  document.getElementById("status-p1").innerHTML = "";
-  document.getElementById("status-p2").innerHTML = "";
-}
-
 
 function getSelectedShape(playerNumber) {
 
@@ -306,11 +207,125 @@ function changeImage(strChoice, playerNumber) {
 
 }
 
+// In case there was a game that has not been finished
+function getStatus(inst) {
+  document.getElementById("reveal1").disabled = true;
+  document.getElementById("reveal2").disabled = true;
+  document.getElementById("play").disabled = true;
+
+  //enable by default
+  inst.getAddress(1).then(addr => {
+    if (addr == '0x0000000000000000000000000000000000000000' || addr == '0x') {
+      document.getElementById("select_player1").disabled = true;
+      document.getElementById("str1").disabled = true;
+      document.getElementById("lock1").disabled = true;
+      document.getElementById("status-p1").innerHTML = "Please register.";
+      document.getElementById("header_p1").innerHTML = "Player1";
+    } else {
+      setRegistered(1, addr);
+    }
+  });
+  inst.getAddress(2).then(addr => {
+    if (addr == '0x0000000000000000000000000000000000000000' || addr == '0x') {
+      document.getElementById("select_player2").disabled = true;
+      document.getElementById("str2").disabled = true;
+      document.getElementById("lock2").disabled = true;
+      document.getElementById("status-p2").innerHTML = "Please register.";
+      document.getElementById("header_p2").innerHTML = "Player2";
+    } else {
+      setRegistered(2, addr);
+    }
+  });
+  inst.hasLocked(1).then(boolean => {
+    if (boolean) {
+      setLocked(1, inst);
+    }
+  });
+  inst.hasLocked(2).then(boolean => {
+    if (boolean) {
+      setLocked(2, inst);
+    }
+  });
+  inst.hasRevealed(1).then(boolean => {
+    if (boolean) {
+      setRevealed(1, inst);
+    }
+  });
+  inst.hasRevealed(2).then(boolean => {
+    if (boolean) {
+      setRevealed(2, inst);
+    }
+  });
+}
+
+function setRegistered(playerNumber, addr) {
+  if (playerNumber == 1) {
+    document.getElementById("register1").disabled = true;
+    document.getElementById("status-p1").innerHTML = "Please lock shape.";
+    document.getElementById("header_p1").innerHTML = "Player1: " + addr;
+    document.getElementById("select_player1").disabled = false;
+    document.getElementById("str1").disabled = false;
+    document.getElementById("lock1").disabled = false;
+  } else {
+    document.getElementById("register2").disabled = true;
+    document.getElementById("status-p2").innerHTML = "Please lock shape.";
+    document.getElementById("header_p2").innerHTML = "Player2: " + addr;
+    document.getElementById("select_player2").disabled = false;
+    document.getElementById("str2").disabled = false;
+    document.getElementById("lock2").disabled = false;
+  }
+}
+
+function setLocked(playerNumber, inst) {
+  if (playerNumber == 1) {
+    document.getElementById("status-p1").innerHTML = "Successfully locked player shape.";
+    document.getElementById("lock1").disabled = true;
+  } else {
+    document.getElementById("status-p2").innerHTML = "Successfully locked player shape.";
+    document.getElementById("lock2").disabled = true;
+  }
+  checkBothLocked(inst);
+}
+
+function setRevealed(playerNumber, inst) {
+  if (playerNumber == 1) {
+    document.getElementById("status-p1").innerHTML = "Successfully revealed player shape.";
+    document.getElementById("reveal1").disabled = true;
+  } else {
+    document.getElementById("status-p2").innerHTML = "Successfully revealed player shape.";
+    document.getElementById("reveal2").disabled = true;
+  }
+  checkBothRevealed(inst);
+}
+
+function checkBothLocked(inst) {
+  inst.hasLocked(1).then(boolean1 => {
+    if (boolean1) {
+      return inst.hasLocked(2).then(boolean2 => {
+        if (boolean2) {
+          document.getElementById("reveal1").disabled = false;
+          document.getElementById("reveal2").disabled = false;;
+        }
+      });
+    }
+  });
+}
+
+function checkBothRevealed(inst) {
+  inst.hasRevealed(1).then(boolean1 => {
+    if (boolean1) {
+      return inst.hasRevealed(2).then(boolean2 => {
+        if (boolean2) {
+          document.getElementById("play").disabled = false;
+        }
+      });
+    }
+  });
+}
+
 
 $(function() {
   $(window).load(function() {
-    document.getElementById("reveal1").disabled = true;
-    document.getElementById("reveal2").disabled = true;
     App.init();
   });
 

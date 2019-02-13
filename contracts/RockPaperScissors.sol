@@ -74,7 +74,7 @@ contract RockPaperScissors {
   * @param playerNumber The player's number (either 1 or 2).
   * @return The player's address.
   */
-  function getPlayer(int playerNumber) public view returns (address) {
+  function getAddress(int playerNumber) public view returns (address) {
     if (playerNumber == 1)
       return player1;
     else
@@ -119,8 +119,8 @@ contract RockPaperScissors {
   function resetVariables() public {
     revealedP1Shape = "";
     revealedP2Shape = "";
-    nullifyAddr(player1);
-    nullifyAddr(player2);
+    player1 = address(0);
+    player2 = address(0);
 		hash1 = bytes32(0);
 		hash2 = bytes32(0);
   }
@@ -142,10 +142,8 @@ contract RockPaperScissors {
     }
   }
 
-  // returns bool so we can check if the web UI needs to be updated
-
   /**
-  * @notice This function locks a player's shape.
+  * @notice This function locks a player's shape by creating a hash of the passed in shape and string XORed.
   * @param playerNumber The player's number (either 1 or 2).
   * @param shape The player's selected shape ("Rock", "Paper" or "Scissors").
   * @param randomStringToHash The player's selected random string to hash the shape with.
@@ -242,14 +240,6 @@ contract RockPaperScissors {
     lastWinner = winner;
     resetVariables();
 
-  }
-
-  /**
-  * @notice This function sets the specified address to 0.
-  * @param addr The address to be nullified.
-  */
-  function nullifyAddr(address addr) public pure {
-    addr = address(0);
   }
 
   /**
