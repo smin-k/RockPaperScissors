@@ -14,49 +14,55 @@
 <body>
   <div id="outerContainer">
     <h1>RockPaperScissors</h1>
-    <div id="leftPlayerContainer">
-      <header id="header_p1">
+    <div id="topPlayerContainer">
+      <header id="header-p1">
         Player 1
       </header>
       <button class="button" id="register1" type="button" onclick="App.registerPlayer(1)">
         Register Me
       </button>
-      <select id="select_player1" onchange="changeImage(getSelectedShape(1), 1)">
+      <select id="select-player1" onchange="changeImage(getSelectedShape(1), 1)">
         <option>Rock</option>
         <option>Paper</option>
         <option>Scissors</option>
       </select>
       <input id="str1" type="text" placeholder="Random string"><br>
       <div>
-        <img id="img_player1" src="/img/Rock.png" width="200" height="200">
+        <img class="img" id="img-player1" src="/img/Rock.png" width="200" height="200">
       </div>
-      <p id="status-p1"></p>
-      <button class="button" id = "lock1" type="button" onclick="App.lockShape(1)">Lock Shape</button>
-      <button class="button" id = "reveal1" type="button" onclick="App.revealShape(1)">Reveal Shape</button>
+      <p class="status" id="status-p1"></p>
+      <div id="lock-reveal-div">
+        <button class="button" id = "lock1" type="button" onclick="App.lockShape(1)">Lock Shape</button>
+        <button class="button" id = "reveal1" type="button" onclick="App.revealShape(1)">Reveal Shape</button>
+      </div>
     </div>
-    <div id="rightPlayerContainer">
-      <header id="header_p2">
+    <div id="bottomPlayerContainer">
+      <header id="header-p2">
         Player 2
       </header>
       <button class="button" id="register2" type="button" onclick="App.registerPlayer(2)">
         Register Me
       </button>
-      <select id="select_player2" onchange="changeImage(getSelectedShape(2), 2)">
+      <select id="select-player2" onchange="changeImage(getSelectedShape(2), 2)">
         <option>Rock</option>
         <option>Paper</option>
         <option>Scissors</option>
       </select>
       <input id="str2" type="text" placeholder="Random string"><br>
       <div>
-        <img id="img_player2" src="/img/Rock.png" width="200" height="200">
+        <img class="img" id="img-player2" src="/img/Rock.png" width="200" height="200">
       </div>
-      <p id="status-p2"></p>
-      <button class="button" id = "lock2" type="button" onclick="App.lockShape(2)">Lock Shape</button>
-      <button class="button" id = "reveal2" type="button" onclick="App.revealShape(2)">Reveal Shape</button>
+      <p class="status" id="status-p2"></p>
+      <div id="lock-reveal-div">
+        <button class="button" id = "lock2" type="button" onclick="App.lockShape(2)">Lock Shape</button>
+        <button class="button" id = "reveal2" type="button" onclick="App.revealShape(2)">Reveal Shape</button>
+      </div>
     </div>
-    <button class="button" id="distribute-rewards" type="button" onclick="App.distributeRewards()">Distribute Rewards</button>
     <div>
-      <p id="winner-label"></p>
+      <div class="wrapper">
+        <button id="distribute-rewards" type="button" onclick="App.distributeRewards()">DISTRIBUTE REWARDS</button>
+        <p id="winner-label"></p>
+      </div>
     </div>
   </div>
   <script>

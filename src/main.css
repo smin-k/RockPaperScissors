@@ -7,7 +7,29 @@ body {
 h1 {
     color: black;
     font-size: 50px;
-    margin-top: 20px;
+    margin-top: 0px;
+}
+
+.wrapper {
+    text-align: center;
+}
+
+.img {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.status {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+#distribute-rewards {
+    position:inherit;
+}
+
+#winner-label {
+    position:inherit;
 }
 
 #outerContainer {
@@ -16,18 +38,22 @@ h1 {
     margin-right: auto;
 }
 
-#leftPlayerContainer {
+#topPlayerContainer {
+    text-align: center;
+    border-bottom: 0.5px solid lightgray;
+    margin-top: -40px;
+    margin-bottom: 10px;
+}
+
+#bottomPlayerContainer {
     width: 50%;
     text-align: center;
     margin-left: auto;
     margin-right: auto;
 }
 
-#rightPlayerContainer {
-    width: 50%;
-    text-align: center;
-    margin-left: auto;
-    margin-right: auto;
+#lock-reveal-div {
+  margin-bottom: 10px;
 }
 
 #headerContainer {

@@ -216,9 +216,9 @@ App = {
  */
 function getSelectedShape(playerNumber) {
   if (playerNumber == 1) {
-    return document.getElementById("select_player1").value;
+    return document.getElementById("select-player1").value;
   } else {
-    return document.getElementById("select_player2").value;
+    return document.getElementById("select-player2").value;
   }
 }
 
@@ -249,9 +249,9 @@ function getRandomString(playerNumber) {
  */
 function changeImage(strShape, playerNumber) {
   if (playerNumber == 1) {
-    document.getElementById("img_player1").src = "/img/" + strShape + ".png";
+    document.getElementById("img-player1").src = "/img/" + strShape + ".png";
   } else {
-    document.getElementById("img_player2").src = "/img/" + strShape + ".png";
+    document.getElementById("img-player2").src = "/img/" + strShape + ".png";
   }
 }
 
@@ -314,17 +314,17 @@ function getStatus(inst) {
  */
 function setNotRegistered(playerNumber) {
   if (playerNumber == 1) {
-    document.getElementById("select_player1").disabled = true;
+    document.getElementById("select-player1").disabled = true;
     document.getElementById("str1").disabled = true;
     document.getElementById("lock1").disabled = true;
     document.getElementById("status-p1").innerHTML = "Please register.";
-    document.getElementById("header_p1").innerHTML = "Player1";
+    document.getElementById("header-p1").innerHTML = "Player1";
   } else {
-    document.getElementById("select_player2").disabled = true;
+    document.getElementById("select-player2").disabled = true;
     document.getElementById("str2").disabled = true;
     document.getElementById("lock2").disabled = true;
     document.getElementById("status-p2").innerHTML = "Please register.";
-    document.getElementById("header_p2").innerHTML = "Player2";
+    document.getElementById("header-p2").innerHTML = "Player2";
   }
 }
 
@@ -339,15 +339,15 @@ function setRegistered(playerNumber, addr) {
   if (playerNumber == 1) {
     document.getElementById("register1").disabled = true;
     document.getElementById("status-p1").innerHTML = "Please lock shape.";
-    document.getElementById("header_p1").innerHTML = "Player1: " + addr;
-    document.getElementById("select_player1").disabled = false;
+    document.getElementById("header-p1").innerHTML = "Player1: " + addr;
+    document.getElementById("select-player1").disabled = false;
     document.getElementById("str1").disabled = false;
     document.getElementById("lock1").disabled = false;
   } else {
     document.getElementById("register2").disabled = true;
     document.getElementById("status-p2").innerHTML = "Please lock shape.";
-    document.getElementById("header_p2").innerHTML = "Player2: " + addr;
-    document.getElementById("select_player2").disabled = false;
+    document.getElementById("header-p2").innerHTML = "Player2: " + addr;
+    document.getElementById("select-player2").disabled = false;
     document.getElementById("str2").disabled = false;
     document.getElementById("lock2").disabled = false;
   }
