@@ -2,7 +2,7 @@
 
 ## Description
 
-Rock Paper Scissors is a hand game usually played between two people, in which each player simultaneously forms one of three shapes with an outstretched hand. The shapes that players can form are Rock (a closed fist), Paper (a flat hand), and Scissors (a fist with the index finger and middle finger extended, forming a V). This is a simultaneous, zero- sum game, which only has two possible outcomes: a win for one player and a loss for the other, or a draw [1‐ ]. The outcome of the game is determined by the shapes that the players have chosen:
+Rock Paper Scissors is a hand game usually played between two people, in which each player simultaneously forms one of three shapes with an outstretched hand. The shapes that players can form are Rock (a closed fist), Paper (a flat hand), and Scissors (a fist with the index finger and middle finger extended, forming a V). This is a simultaneous, zero- sum game, which only has two possible outcomes: a win for one player and a loss for the other, or a draw (see: [Wikipedia](https://en.wikipedia.org/wiki/Rock–paper–scissors)). The outcome of the game is determined by the shapes that the players have chosen:
 
 - Rock beats Scissors 
 - Paper beats Rock
@@ -10,7 +10,7 @@ Rock Paper Scissors is a hand game usually played between two people, in which e
 
 If two players have chosen the same shape then there will be a draw.
 
---image
+<img width="1440" alt="screenshot 2019-02-13 at 19 16 49" src="https://user-images.githubusercontent.com/16804823/52737864-412c5d00-2fc5-11e9-9e48-eaa919b38965.png">
 
 ## Implementation
 
@@ -26,7 +26,8 @@ The winner of the game is rewarded with a financial reward of 10 ether. In the c
 
 ## Architectural Choice
 
---image 
+![untitled diagram-9 18 11 30](https://user-images.githubusercontent.com/16804823/52737891-586b4a80-2fc5-11e9-9ad8-2ada031897e3.jpg)
+
 For this project an HTML/JavaScript web application was designed, which directly interacts with Web3.js and a Truffle contract instance created from the smart contract written in Solidity. The Web3.js and TruffleContract build the communication bridge between the web application and the Ethereum blockchain.
 
 ## Application Walkthrough
