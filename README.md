@@ -1,6 +1,6 @@
 # RockPaperScissors
 
-## Description
+## Description
 
 Rock Paper Scissors is a hand game usually played between two people, in which each player simultaneously forms one of three shapes with an outstretched hand. The shapes that players can form are Rock (a closed fist), Paper (a flat hand), and Scissors (a fist with the index finger and middle finger extended, forming a V). This is a simultaneous, zero- sum game, which only has two possible outcomes: a win for one player and a loss for the other, or a draw [1‐ ]. The outcome of the game is determined by the shapes that the players have chosen:
 
@@ -24,7 +24,7 @@ This project entails an Ethereum smart contract based implementation of the game
 
 The winner of the game is rewarded with a financial reward of 10 ether. In the case of a draw, both players receive 5 ether each.
 
-## Architectural Choice
+## Architectural Choice
 
 --image 
 For this project an HTML/JavaScript web application was designed, which directly interacts with Web3.js and a Truffle contract instance created from the smart contract written in Solidity. The Web3.js and TruffleContract build the communication bridge between the web application and the Ethereum blockchain.
@@ -44,7 +44,7 @@ npm run dev
 
 The web application will load in your browser and the game is ready to be played.
 
-### Gameplay
+### Gameplay
 
 * Register as Player1 by pressing ‘Register’ — this will trigger a transaction charging the registering address 5 ether (S2 & S3)
 * Register a second player by changing to another address in Metamask and registering this player as Player2 (Player2 is also charged 5 ether)
