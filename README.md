@@ -47,7 +47,7 @@ The web application will load in your browser and the game is ready to be played
 
 ### Gameplay
 
-* Register as Player1 by pressing ‘Register’ — this will trigger a transaction charging the registering address 5 ether (S2 & S3)
+* Register as Player1 by pressing ‘Register’ — this will trigger a transaction charging the registering address 5 ether
 * Register a second player by changing to another address in Metamask and registering this player as Player2 (Player2 is also charged 5 ether)
 * Both players will need to select a shape and type a string and then press ‘Lock’
 * Once both players have locked their hashes they will be able to both reveal their shapes
