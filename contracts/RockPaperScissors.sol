@@ -77,6 +77,11 @@ contract RockPaperScissors {
         return lastWinner;
     }
 
+    function getLastActionTime() public view returns (uint) {
+    return lastActionTime;
+    }
+
+
     function resetVariables() internal {
         revealedP1Shape = "";
         revealedP2Shape = "";
