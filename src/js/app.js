@@ -218,7 +218,7 @@ function getRandomString(playerNumber) {
 
 function changeImage(strShape, playerNumber) {
   if (!strShape) {
-    strShape = "question";  // 🔥 값이 없으면 강제로 question
+    strShape = "Question";  // 🔥 값이 없으면 강제로 question
   }
 
   if (playerNumber == 1) {
