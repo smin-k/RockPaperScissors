@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-  <script src="js/app.js"></script>
-  <script src="js/web3.min.js"></script>
-  <script src="js/truffle-contract.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.7.5/dist/web3.min.js"></script> <!-- 최신 Web3 -->
+  <script src="js/app.js"></script> <!-- app.js는 맨 마지막에 load해도 괜찮지만 지금 구조 유지 -->
   <meta charset="utf-8">
   <title>Rock Paper Scissors</title>
   <link rel="stylesheet" type="text/css" href="main.css" />
@@ -14,6 +13,23 @@
 <body>
   <div id="outerContainer">
     <h1>RockPaperScissors</h1>
+
+    <div id="connectContainer" style="margin-bottom: 50px;">
+      <input type="text" id="contract-address" placeholder="Enter Contract Address" style="width: 300px; height: 30px;">
+      <button class="button" style="height: 35px;" onclick="App.connectContract()">Connect Contract</button>
+      <div id="connection-status" style="margin-top:10px; padding: 10px; background-color: #e8f5e9; border-radius: 5px; font-weight: bold; color: green; min-height: 40px;">
+        <!-- Connected status here -->
+      </div>
+    </div>
+
+    <div>
+      <button id="timeout-reset" type="button" onclick="App.timeoutReset()" disabled>Timeout Reset</button>
+    </div>
+    <div id="timeout-status" style="margin-top:10px; font-weight:bold; color:#ff9900;"></div>
+
+  
+    <!-- 🔥 여기까지 추가 -->
+
     <div id="topPlayerContainer">
       <header id="header-p1">
         Player 1
@@ -22,20 +38,23 @@
         Register Me
       </button>
       <select id="select-player1" onchange="changeImage(getSelectedShape(1), 1)">
+        <option value="">-- Select --</option>
         <option>Rock</option>
         <option>Paper</option>
         <option>Scissors</option>
       </select>
-      <input id="str1" type="text" placeholder="Random string"><br>
+      
+      <input id="str1" type="text" placeholder="Password"><br>
       <div>
-        <img class="img" id="img-player1" src="/img/Rock.png" width="200" height="200">
+        <img class="img" id="img-player1" src="/img/question.png" width="200" height="200">
       </div>
       <p class="status" id="status-p1"></p>
       <div id="lock-reveal-div">
-        <button class="button" id = "lock1" type="button" onclick="App.lockShape(1)">Lock Shape</button>
-        <button class="button" id = "reveal1" type="button" onclick="App.revealShape(1)">Reveal Shape</button>
+        <button class="button" id="lock1" type="button" onclick="App.lockShape(1)">Lock Shape</button>
+        <button class="button" id="reveal1" type="button" onclick="App.revealShape(1)">Reveal Shape</button>
       </div>
     </div>
+
     <div id="bottomPlayerContainer">
       <header id="header-p2">
         Player 2
@@ -44,20 +63,22 @@
         Register Me
       </button>
       <select id="select-player2" onchange="changeImage(getSelectedShape(2), 2)">
+        <option value="">-- Select --</option>
         <option>Rock</option>
         <option>Paper</option>
         <option>Scissors</option>
       </select>
-      <input id="str2" type="text" placeholder="Random string"><br>
+      <input id="str2" type="text" placeholder="Password"><br>
       <div>
-        <img class="img" id="img-player2" src="/img/Rock.png" width="200" height="200">
+        <img class="img" id="img-player2" src="/img/question.png" width="200" height="200">
       </div>
       <p class="status" id="status-p2"></p>
       <div id="lock-reveal-div">
-        <button class="button" id = "lock2" type="button" onclick="App.lockShape(2)">Lock Shape</button>
-        <button class="button" id = "reveal2" type="button" onclick="App.revealShape(2)">Reveal Shape</button>
+        <button class="button" id="lock2" type="button" onclick="App.lockShape(2)">Lock Shape</button>
+        <button class="button" id="reveal2" type="button" onclick="App.revealShape(2)">Reveal Shape</button>
       </div>
     </div>
+
     <div>
       <div class="wrapper">
         <button id="distribute-rewards" type="button" onclick="App.distributeRewards()">DISTRIBUTE REWARDS</button>
@@ -65,7 +86,5 @@
       </div>
     </div>
   </div>
-  <script>
-  </script>
-
 </body>
+</html>

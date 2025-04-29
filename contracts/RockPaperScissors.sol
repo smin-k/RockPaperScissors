@@ -1,264 +1,196 @@
-pragma solidity ^0.5.0;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.2;
 
 /**
 * @title RockPaperScissors
-* @author Noah-Vincenz Noeh <noah-vincenz.noeh18@imperial.ac.uk>
-* @notice This smart contract allows two players to play Rock Paper Scissors against each other and the winner gets some Ether as reward.
+* @notice Two players play Rock-Paper-Scissors. Timeout mechanism rewards the active player if timeout happens.
 */
 contract RockPaperScissors {
-  address payable player1;
-  address payable player2;
-  bytes32 hash1;
-  bytes32 hash2;
-  string revealedP1Shape;
-  string revealedP2Shape;
-  int lastWinner;
+    event ShapeLocked(address indexed player, int playerNumber);
+    event ShapeRevealed(address indexed player, int playerNumber);
 
-  modifier notRegisteredYet() {
-    require(msg.sender != player1 && msg.sender != player2);
-    _;
-  }
+    address payable public player1;
+    address payable public player2;
+    bytes32 private hash1;
+    bytes32 private hash2;
+    string private revealedP1Shape;
+    string private revealedP2Shape;
+    int public lastWinner;
+    uint public lastActionTime; // 🔥 마지막 액션 타임스탬프 기록
 
-  modifier isRegistered() {
-    require(msg.sender == player1 || msg.sender == player2);
-    _;
-  }
+    modifier notRegisteredYet() {
+        require(msg.sender != player1 && msg.sender != player2, "Already registered");
+        _;
+    }
 
-  modifier hasEnoughEther() {
-    require(msg.value >= 5 ether);
-    _;
-  }
+    modifier isRegistered() {
+        require(msg.sender == player1 || msg.sender == player2, "Not a registered player");
+        _;
+    }
 
-  modifier bothLocked(){
-    require(hash1 != bytes32(0) && hash2 != bytes32(0));
-    _;
-  }
+    modifier hasEnoughEther() {
+        require(msg.value >= 5 ether, "Minimum 5 ether required");
+        _;
+    }
 
-  modifier bothRevealed(){
-    require(!stringsEqual(revealedP1Shape, "") && !stringsEqual(revealedP2Shape, ""));
-    _;
-  }
+    modifier bothLocked() {
+        require(hash1 != bytes32(0) && hash2 != bytes32(0), "Both players must lock first");
+        _;
+    }
 
-  // this is to make sure that a registered player cannot lock / reveal another player's shape
-  modifier correctPlayer(int playerNumber) {
-    require((msg.sender == player1 && playerNumber == 1) || (msg.sender == player2 && playerNumber == 2));
-    _;
-  }
+    modifier bothRevealed() {
+        require(!stringsEqual(revealedP1Shape, "") && !stringsEqual(revealedP2Shape, ""), "Both players must reveal first");
+        _;
+    }
 
-  /**
-  * @notice This function returns a boolean whether the corresponding player has locked their shape.
-  * @param playerNumber The player's number (either 1 or 2).
-  * @return true or false.
-  */
-  function hasLocked(int playerNumber) public view returns (bool) {
-    if (playerNumber == 1)
-      return (hash1 != bytes32(0));
-    else
-      return (hash2 != bytes32(0));
-  }
+    modifier correctPlayer(int playerNumber) {
+        require((msg.sender == player1 && playerNumber == 1) || (msg.sender == player2 && playerNumber == 2), "Wrong player");
+        _;
+    }
 
-  /**
-  * @notice This function returns a boolean whether the corresponding player has revealed their shape.
-  * @param playerNumber The player's number (either 1 or 2).
-  * @return true or false.
-  */
-  function hasRevealed(int playerNumber) public view returns (bool) {
-    if (playerNumber == 1)
-      return (!stringsEqual(revealedP1Shape, ""));
-    else
-      return (!stringsEqual(revealedP2Shape, ""));
-  }
+    function hasLocked(int playerNumber) public view returns (bool) {
+        if (playerNumber == 1) return (hash1 != bytes32(0));
+        else return (hash2 != bytes32(0));
+    }
 
-  /**
-  * @notice This function returns the corresponding player's address.
-  * @param playerNumber The player's number (either 1 or 2).
-  * @return The player's address.
-  */
-  function getAddress(int playerNumber) public view returns (address) {
-    if (playerNumber == 1)
-      return player1;
-    else
-      return player2;
-  }
+    function hasRevealed(int playerNumber) public view returns (bool) {
+        if (playerNumber == 1) return (bytes(revealedP1Shape).length != 0);
+        else return (bytes(revealedP2Shape).length != 0);
+    }
 
-  /**
-  * @notice This function returns the corresponding player's revealed string.
-  * @param playerNumber The player's number (either 1 or 2).
-  * @return The player's revealed string - "Rock", "Paper" or "Scissors".
-  */
-  function getRevealed(int playerNumber) public view returns (string memory) {
-    if (playerNumber == 1)
-      return revealedP1Shape;
-    else
-      return revealedP2Shape;
-  }
+    function getAddress(int playerNumber) public view returns (address) {
+        if (playerNumber == 1) return player1;
+        else return player2;
+    }
 
-  /**
-  * @notice This function returns the corresponding player's hash.
-  * @param playerNumber The player's number (either 1 or 2).
-  * @return The player's hash.
-  */
-  function getHash(int playerNumber) public view returns (bytes32) {
-    if (playerNumber == 1)
-      return hash1;
-    else
-      return hash2;
-  }
+    function getRevealed(int playerNumber) public view returns (string memory) {
+        if (playerNumber == 1) return revealedP1Shape;
+        else return revealedP2Shape;
+    }
 
-  /**
-  * @notice This function returns the winner of the last game.
-  * @return The player's numbe - either 1 or 2 (or 0 if it was a draw).
-  */
-  function getWinner() public view returns (int) {
-    return lastWinner;
-  }
+    function getHash(int playerNumber) public view returns (bytes32) {
+        if (playerNumber == 1) return hash1;
+        else return hash2;
+    }
 
-  /**
-  * @notice This function is called to reset the contract's variable states for a new game.
-  */
-  function resetVariables() public {
-    revealedP1Shape = "";
-    revealedP2Shape = "";
-    player1 = address(0);
-    player2 = address(0);
-		hash1 = bytes32(0);
-		hash2 = bytes32(0);
-  }
+    function getWinner() public view returns (int) {
+        return lastWinner;
+    }
 
-  /**
-  * @notice This function registers a player address to the game.
-  * @param playerNumber The player's number (either 1 or 2).
-  */
-  function registerPlayer(int playerNumber) public payable notRegisteredYet hasEnoughEther {
+    function resetVariables() internal {
+        revealedP1Shape = "";
+        revealedP2Shape = "";
+        player1 = payable(address(0));
+        player2 = payable(address(0));
+        hash1 = bytes32(0);
+        hash2 = bytes32(0);
+        lastActionTime = 0;
+    }
 
-    if (playerNumber == 1) {
-      if (player1 == address(0)) {
-          player1 = msg.sender;
+    function registerPlayer(int playerNumber) public payable notRegisteredYet hasEnoughEther {
+        require(playerNumber == 1 || playerNumber == 2, "Invalid player number");
+
+        if (playerNumber == 1) {
+            require(player1 == address(0), "Player 1 already registered");
+            player1 = payable(msg.sender);
+        } else {
+            require(player2 == address(0), "Player 2 already registered");
+            player2 = payable(msg.sender);
         }
-    } else {
-      if (player2 == address(0)) {
-          player2 = msg.sender;
-      }
+
+        lastActionTime = block.timestamp; // 🔥 액션 시간 업데이트
     }
-  }
 
-  /**
-  * @notice This function locks a player's shape by creating a hash of the passed in shape and string XORed.
-  * @param playerNumber The player's number (either 1 or 2).
-  * @param shape The player's selected shape ("Rock", "Paper" or "Scissors").
-  * @param randomStringToHash The player's selected random string to hash the shape with.
-  */
-  function lockShape(int playerNumber, string memory shape, string memory randomStringToHash) public correctPlayer(playerNumber) isRegistered {
-    // if the player is locking his own shape AND if it is the player's address that calls this AND if the player's hash has not been set
-    if(msg.sender == player1 && hash1 == bytes32(0)) {
-      // XOR random string with shape
-      hash1 = keccak256(bytes(shape)) ^ keccak256(bytes(randomStringToHash));
+    function lockShape(int playerNumber, string memory shape, string memory randomStringToHash) public correctPlayer(playerNumber) isRegistered {
+        if (msg.sender == player1 && hash1 == bytes32(0)) {
+            hash1 = keccak256(bytes(shape)) ^ keccak256(bytes(randomStringToHash));
+            emit ShapeLocked(msg.sender, playerNumber);
+        }
+        if (msg.sender == player2 && hash2 == bytes32(0)) {
+            hash2 = keccak256(bytes(shape)) ^ keccak256(bytes(randomStringToHash));
+            emit ShapeLocked(msg.sender, playerNumber);
+        }
+
+        lastActionTime = block.timestamp; // 🔥 액션 시간 업데이트
     }
-    if(msg.sender == player2 && hash2 == bytes32(0)) {
-      hash2 = keccak256(bytes(shape)) ^ keccak256(bytes(randomStringToHash));
+
+    function revealShape(int playerNumber, string memory shape, string memory randomStringToHash) public isRegistered bothLocked correctPlayer(playerNumber) {
+        bytes32 tempHash = keccak256(bytes(shape)) ^ keccak256(bytes(randomStringToHash));
+
+        if (msg.sender == player1 && tempHash == hash1) {
+            revealedP1Shape = shape;
+            emit ShapeRevealed(msg.sender, playerNumber);
+        }
+        if (msg.sender == player2 && tempHash == hash2) {
+            revealedP2Shape = shape;
+            emit ShapeRevealed(msg.sender, playerNumber);
+        }
+
+        lastActionTime = block.timestamp; // 🔥 액션 시간 업데이트
     }
-  }
 
-  /**
-  * @notice This function reveals a player's shape. This checks whether the stored hash equals the new given hash (consisting of the currently selected shape and string)
-  * @param playerNumber The player's number (either 1 or 2).
-  * @param shape The player's selected shape ("Rock", "Paper" or "Scissors").
-  * @param randomStringToHash The player's selected random string to hash the shape with.
-  */
-  function revealShape(int playerNumber, string memory shape, string memory randomStringToHash) public isRegistered bothLocked correctPlayer(playerNumber) {
-    bytes32 tempHash = keccak256(bytes(shape)) ^ keccak256(bytes(randomStringToHash));
-
-		if(msg.sender == player1){
-			if(tempHash == hash1){
-				if(stringsEqual(shape, "Rock")) {
-					revealedP1Shape = "Rock";
-				}
-        if(stringsEqual(shape, "Paper")) {
-          revealedP1Shape = "Paper";
-				}
-        if(stringsEqual(shape, "Scissors")) {
-          revealedP1Shape = "Scissors";
-				}
-        // shape is going to be one of the above
-			}
-		}
-    if(msg.sender == player2){
-			if(tempHash == hash2){
-				if(stringsEqual(shape, "Rock")) {
-					revealedP2Shape = "Rock";
-				}
-        if(stringsEqual(shape, "Paper")) {
-          revealedP2Shape = "Paper";
-				}
-        if(stringsEqual(shape, "Scissors")) {
-          revealedP2Shape = "Scissors";
-				}
-			}
-		}
-	}
-
-  /**
-  * @notice This function computes the winner shape from two shapes and returns 1 if player 1 wins, 2 if player 2 wins and 0 if it is a draw.
-  * @param revealedP1 Player 1's revealed shape.
-  * @param revealedP2 Player 2's revealed shape.
-  * @return 1, 2 or 0 depending on which player won the game (0 in the case of a draw).
-  */
-  function computeWinner(string memory revealedP1, string memory revealedP2) pure public returns (int) {
-
-    if (stringsEqual(revealedP1, revealedP2)) return 0;
-    else if (stringsEqual(revealedP1, "Rock") && stringsEqual(revealedP2, "Scissors")) return 1;
-    else if (stringsEqual(revealedP1, "Rock") && stringsEqual(revealedP2, "Paper")) return 2;
-    else if (stringsEqual(revealedP1, "Paper") && stringsEqual(revealedP2, "Rock")) return 1;
-    else if (stringsEqual(revealedP1, "Paper") && stringsEqual(revealedP2, "Scissors")) return 2;
-    else if (stringsEqual(revealedP1, "Scissors") && stringsEqual(revealedP2, "Rock")) return 2;
-    else if (stringsEqual(revealedP1, "Scissors") && stringsEqual(revealedP2, "Paper")) return 1;
-    else return 0;
-
-  }
-
-  /**
-  * @notice This function is called when both players have locked and revealed their shapes and the 'Distribute Rewards' button in the UI is pressed.
-  */
-  function distributeRewards() public payable bothLocked bothRevealed isRegistered {
-
-    int winner = computeWinner(revealedP1Shape, revealedP2Shape);
-
-    if (winner == 1) {
-
-      player1.transfer(10 ether);
-
-    } else if (winner == 2) {
-
-      player2.transfer(10 ether);
-
-    } else {
-      // in the case of a draw, send half money to both parties
-      player1.transfer(5 ether);
-			player2.transfer(5 ether);
-
+    function computeWinner(string memory revealedP1, string memory revealedP2) pure public returns (int) {
+        if (stringsEqual(revealedP1, revealedP2)) return 0;
+        else if (stringsEqual(revealedP1, "Rock") && stringsEqual(revealedP2, "Scissors")) return 1;
+        else if (stringsEqual(revealedP1, "Rock") && stringsEqual(revealedP2, "Paper")) return 2;
+        else if (stringsEqual(revealedP1, "Paper") && stringsEqual(revealedP2, "Rock")) return 1;
+        else if (stringsEqual(revealedP1, "Paper") && stringsEqual(revealedP2, "Scissors")) return 2;
+        else if (stringsEqual(revealedP1, "Scissors") && stringsEqual(revealedP2, "Rock")) return 2;
+        else if (stringsEqual(revealedP1, "Scissors") && stringsEqual(revealedP2, "Paper")) return 1;
+        else return 0;
     }
-    lastWinner = winner;
-    resetVariables();
 
-  }
+    function distributeRewards() public payable bothLocked bothRevealed isRegistered {
+        int winner = computeWinner(revealedP1Shape, revealedP2Shape);
 
-  /**
-  * @notice This function compares two strings (memory) and checks whether these are equal and returns the corresponding boolean.
-  * @param stringA First string to compare with.
-  * @param stringB Second string to compare with.
-  * @return true or false depending on whether the two strings are equal.
-  */
-  function stringsEqual(string memory stringA, string memory stringB) public pure returns (bool) {
-    bytes memory a = bytes(stringA);
-    bytes memory b = bytes(stringB);
+        if (winner == 1) {
+            (bool sent, ) = player1.call{value: 10 ether}("");
+            require(sent, "Failed to send Ether");
+        } else if (winner == 2) {
+            (bool sent2, ) = player2.call{value: 5 ether}("");
+            require(sent2, "Failed to send Ether");
+        } else {
+            player1.transfer(5 ether);
+            player2.transfer(5 ether);
+        }
 
-    if (a.length != b.length)
-        return false;
+        lastWinner = winner;
+        resetVariables();
+    }
 
-    for (uint i = 0; i < a.length; i ++)
-        if (a[i] != b[i])
-            return false;
-        return true;
-  }
+    // 🔥 타임아웃 강제 리셋 및 보상
+    function timeoutReset() public {
+        require(block.timestamp > lastActionTime + 600, "Game is still active");
 
+        bool p1Locked = hasLocked(1);
+        bool p2Locked = hasLocked(2);
+        bool p1Revealed = hasRevealed(1);
+        bool p2Revealed = hasRevealed(2);
+
+        uint balance = address(this).balance;
+
+        if (p1Locked && p2Locked) {
+            if (!p1Revealed && !p2Revealed) {
+                player1.transfer(balance / 2);
+                player2.transfer(balance / 2);
+            } else if (p1Revealed && !p2Revealed) {
+                player1.transfer(balance);
+            } else if (!p1Revealed && p2Revealed) {
+                player2.transfer(balance);
+            }
+        } else if (p1Locked && !p2Locked) {
+            player1.transfer(balance);
+        } else if (!p1Locked && p2Locked) {
+            player2.transfer(balance);
+        } else {
+            player1.transfer(balance / 2);
+            player2.transfer(balance / 2);
+        }
+
+        resetVariables();
+    }
+
+    function stringsEqual(string memory a, string memory b) public pure returns (bool) {
+        return (keccak256(bytes(a)) == keccak256(bytes(b)));
+    }
 }

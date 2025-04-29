@@ -40,12 +40,13 @@ h1 {
 
 #topPlayerContainer {
     text-align: center;
-    border-bottom: 0.5px solid lightgray;
+    border-top: 0.5px solid lightgray;
     margin-top: -40px;
     margin-bottom: 10px;
 }
 
 #bottomPlayerContainer {
+    border-top: 0.5px solid lightgray;
     width: 50%;
     text-align: center;
     margin-left: auto;
