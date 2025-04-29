@@ -1,74 +1,55 @@
-RockPaperScissors (Forked & Updated)
-🔄 Updates from Original
-This project is forked from Noah-Vincenz Noeh's original RockPaperScissors DApp and includes significant updates:
+# RockPaperScissors (Forked & Updated)
 
-✅ Updated for Solidity 0.8.x (London Hardfork compatible)
-The smart contract is refactored to use modern Solidity features and syntax based on the London EVM upgrade.
+## 🔄 Updates from Original
 
-✅ Deployed via Remix, instead of Truffle migrations.
+This project is **forked** from [Noah-Vincenz Noeh's original RockPaperScissors DApp](https://github.com/NoahVincenz/RockPaperScissors) and includes the following key updates:
 
-✅ Frontend decoupled: runs independently via npm run dev, and manually connects to a contract address.
+- ✅ **Updated for Solidity 0.8.x (London Hardfork compatible)**  
+- ✅ **Smart contract deployed via Remix** (no Truffle migration used)
+- ✅ **Frontend runs independently using `npm run dev`**, with manual contract address input
+- ⏱ **Timeout Reset Mechanism added**: If a player is inactive for over 10 minutes, the other player can reset
+- 💰 **Penalty Logic**: Timeout rewards only active participants (or splits if both inactive)
 
-⏱ Timeout Reset Mechanism: Prevents game lock-up. If one player is inactive for more than 10 minutes, the other can reset and receive compensation.
+---
 
-💰 Punishment Logic: Timeout reset rewards only the active participant, or splits evenly if both are inactive.
+## 📝 Description
 
-📝 Description
-Rock Paper Scissors is a zero-sum game with three choices — Rock, Paper, Scissors. This DApp ensures fair play via Ethereum smart contracts, utilizing a commit-reveal scheme:
+Rock Paper Scissors is a zero-sum game where two players choose one of three options:
 
-Players lock a hash of (shape + secret)
+- **Rock beats Scissors**
+- **Paper beats Rock**
+- **Scissors beats Paper**
+- **Same choice → Draw**
 
-After both are locked, they reveal
+This implementation ensures fairness by using a **commit-reveal scheme** through Ethereum smart contracts.
 
-Smart contract checks correctness and distributes rewards
+---
 
-🏗 Architecture
+## 🏗 Architecture
 
+![Architecture](https://user-images.githubusercontent.com/16804823/52737891-586b4a80-2fc5-11e9-9ad8-2ada031897e3.jpg)
 
-Differences from the original:
-🛠 Solidity 0.8.x code compatible with London EVM upgrades
+### Key Changes:
 
-🧱 Manual contract deployment via Remix
+- ✨ Modernized to **Solidity 0.8.x**
+- ✨ Compatible with **London EVM**
+- 🚀 **Deployed via Remix**
+- 🌐 Frontend uses **Web3.js** (no Truffle contract wrapper)
+- ⏱ Introduced timeout + reset protection
 
-🌐 Web frontend is separated and connects through Web3.js
+---
 
-⏳ Timeout feature added for resilience and fairness
+## 🚀 How to Use
 
-🚀 How to Use
-1. Contract Deployment (Remix)
-Open Remix
+### 1. Deploy Contract (via Remix)
 
-Paste RockPaperScissors.sol and compile with Solidity 0.8.x
+- Visit [https://remix.ethereum.org](https://remix.ethereum.org)
+- Compile `RockPaperScissors.sol` using **Solidity 0.8.x**
+- Deploy to a network (e.g., Ganache or Sepolia)
+- Copy the deployed contract address
 
-Deploy on any testnet (e.g., Ganache, Sepolia, or MetaMask-injected network)
+### 2. Run Frontend Locally
 
-Copy the deployed contract address
-
-2. Frontend Setup
-bash
-복사
-편집
+```bash
 npm install
 npm run dev
-Visit http://localhost:3000 in your browser.
-Paste the deployed contract address into the input field and click Connect.
-
-🎮 Gameplay Flow
-Each player registers (5 ETH entry)
-
-Lock shape using a secret password
-
-Reveal shape using same password
-
-Distribute rewards
-
-If a player delays over 600 seconds, use Timeout Reset
-
-⏱ Timeout Reset
-Available when no progress has occurred for 10 minutes
-
-Tracked via lastActionTime on-chain
-
-If only one player has participated, they receive full reward
-
-If both are inactive, the reward is split
