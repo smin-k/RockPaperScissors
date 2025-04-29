@@ -319,12 +319,12 @@ function setLocked(playerNumber, inst) {
     document.getElementById("status-p1").innerHTML = "Successfully locked player shape.";
     document.getElementById("lock1").disabled = true;
     document.getElementById("str1").value = "";
-    document.getElementById("img-player1").src = "/img/question.png";  // 🔥 락하면 물음표로 변경
+    document.getElementById("img-player1").src = "/img/Question.png";  // 🔥 락하면 물음표로 변경
   } else {
     document.getElementById("status-p2").innerHTML = "Successfully locked player shape.";
     document.getElementById("lock2").disabled = true;
     document.getElementById("str2").value = "";
-    document.getElementById("img-player2").src = "/img/question.png";  // 🔥 락하면 물음표로 변경
+    document.getElementById("img-player2").src = "/img/Question.png";  // 🔥 락하면 물음표로 변경
   }
   checkBothLocked(inst);
 }
