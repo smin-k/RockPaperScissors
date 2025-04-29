@@ -2,7 +2,7 @@
 
 ## 🔄 Updates from Original
 
-This project is **forked** from [Noah-Vincenz Noeh's original RockPaperScissors DApp](https://github.com/NoahVincenz/RockPaperScissors) and includes the following key updates:
+This project is **forked** from [Noah-Vincenz Noeh's original RockPaperScissors DApp](https://github.com/Noah-Vincenz/RockPaperScissors) and includes the following key updates:
 
 - ✅ **Updated for Solidity 0.8.x (London Hardfork compatible)**  
 - ✅ **Smart contract deployed via Remix** (no Truffle migration used)
