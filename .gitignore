@@ -1,2 +1,10 @@
-# ignore DS_Store
+# dependencies
+node_modules/
+
+# production
+dist/
+build/
+
+# misc
 .DS_Store
+.env
